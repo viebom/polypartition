@@ -1,3 +1,13 @@
+add CMakeLists.txt 
+
+Windows and linux 
+
+polypartitionTest.exe  run successfully
+
+------
+
+
+
 #### PolyPartition
 
 PolyPartition is a lightweight C++ library for polygon partition
