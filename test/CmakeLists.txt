@@ -1,0 +1,38 @@
+
+project(polypartitionTest)
+
+SET(LIB_NAME polypartitionTest)
+
+
+SET(COMMON_SOURCE_FILES
+	"image.cpp"
+	"imageio.cpp"
+	"test.cpp"
+	"${ROOT_DIR}/src/polypartition.cpp"
+	)
+	
+SET(COMMON_HEAD_FILES
+	"image.h"
+	"imageio.h"
+	"${ROOT_DIR}/src/polypartition.h"
+	)
+
+INCLUDE_DIRECTORIES(
+	"${ROOT_DIR}/src/"
+)
+source_group(${XCG_HEADER_FILES} FILES ${COMMON_HEAD_FILES})
+source_group(${XCG_SOURCE_FILES} FILES ${COMMON_SOURCE_FILES})
+
+
+#if(UNIX)
+#	link_directories(
+#		${XCG_ROOT_DIR}/linuxbin64/
+#		)
+#else()
+#	link_directories(
+#		${XCG_ROOT_DIR}/lib/win64/
+#		)
+#endif()
+
+add_executable(${PROJECT_NAME} ${COMMON_HEAD_FILES} ${COMMON_SOURCE_FILES})
+
