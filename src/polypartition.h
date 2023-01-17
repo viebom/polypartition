@@ -21,6 +21,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
+/**
+ * 不规则多边形三角剖分
+ * 使用文档：
+ * https://github.com/cfl997/polypartition
+ */
 #ifndef POLYPARTITION_H
 #define POLYPARTITION_H
 
@@ -312,6 +317,11 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
+	/*
+	 *	支持开洞，并且开洞效果比Triangulate_MONO好
+	 *	Triangulate_MONO中有很多细小的三角形这是我们不需要的
+	 *	cfl-2023/01/17
+	 */
   int Triangulate_EC(TPPLPolyList *inpolys, TPPLPolyList *triangles);
 
   // Creates an optimal polygon triangulation in terms of minimal edge length.
@@ -324,6 +334,10 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
+	/*
+	 *	多边形不考虑洞的情况
+	 *	cfl-2022/01/17
+	 */
   int Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles);
 
   // Triangulates a polygon by first partitioning it into monotone polygons.

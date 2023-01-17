@@ -27,12 +27,22 @@
 #include <limits>
 #include <list>
 
+#include <string>
+
 using namespace std;
 
 #include "polypartition.h"
 
 #include "image.h"
 #include "imageio.h"
+
+
+#define READPATH "../test/"
+#if defined(_MSC_VER) || defined(WIN32) || defined(WIN64)
+#define DRAWPATH "../bin64/"
+#elif defined(unix)
+#define DRAWPATH "../linuxbin64/"
+#endif // defined(_MSC_VER) || defined(WIN32) || defined(WIN64)
 
 void ReadPoly(FILE *fp, TPPLPoly *poly) {
   int i, numpoints, hole;
@@ -54,7 +64,10 @@ void ReadPoly(FILE *fp, TPPLPoly *poly) {
 }
 
 void ReadPoly(const char *filename, TPPLPoly *poly) {
-  FILE *fp = fopen(filename, "r");
+  std::string filen{ filename };
+  std::string fileNameTrue{ READPATH + filen };
+
+  FILE *fp = fopen(fileNameTrue.data(), "r");
   if (!fp) {
     printf("Error reading file %s\n", filename);
     return;
@@ -76,7 +89,10 @@ void ReadPolyList(FILE *fp, list<TPPLPoly> *polys) {
 }
 
 void ReadPolyList(const char *filename, list<TPPLPoly> *polys) {
-  FILE *fp = fopen(filename, "r");
+  std::string readfile{ filename };
+  std::string fileNameTrue{ READPATH + readfile };
+
+  FILE *fp = fopen(fileNameTrue.data(), "r");
   if (!fp) {
     printf("Error reading file %s\n", filename);
     return;
@@ -103,7 +119,9 @@ void WritePoly(FILE *fp, TPPLPoly *poly) {
 }
 
 void WritePoly(const char *filename, TPPLPoly *poly) {
-  FILE *fp = fopen(filename, "w");
+  std::string writefile{ filename };
+  std::string fileNameTrue{ DRAWPATH + writefile };
+  FILE *fp = fopen(writefile.data(), "w");
   if (!fp) {
     printf("Error writing file %s\n", filename);
     return;
@@ -123,7 +141,10 @@ void WritePolyList(FILE *fp, list<TPPLPoly> *polys) {
 }
 
 void WritePolyList(const char *filename, list<TPPLPoly> *polys) {
-  FILE *fp = fopen(filename, "w");
+  std::string writefile{ filename };
+  std::string fileNameTrue{ DRAWPATH + writefile };
+
+  FILE *fp = fopen(writefile.data(), "w");
   if (!fp) {
     printf("Error writing file %s\n", filename);
     return;
@@ -175,6 +196,9 @@ void DrawPoly(Image *img, TPPLPoly *poly, tppl_float xmin, tppl_float xmax, tppl
 }
 
 void DrawPoly(const char *filename, TPPLPoly *poly) {
+  std::string writefile{ filename };
+  std::string fileNameTrue{ DRAWPATH + writefile };
+
   Image img(500, 500);
   Image::Pixel white = { 255, 255, 255 };
   img.Clear(white);
@@ -201,10 +225,13 @@ void DrawPoly(const char *filename, TPPLPoly *poly) {
 
   DrawPoly(&img, poly, xmin, xmax, ymin, ymax);
 
-  io.SaveImage(filename, &img);
+  io.SaveImage(fileNameTrue.data(), &img);
 }
 
 void DrawPolyList(const char *filename, list<TPPLPoly> *polys) {
+  std::string writefile{ filename };
+  std::string fileNameTrue{ DRAWPATH + writefile };
+
   Image img(300, 450);
   Image::Pixel white = { 255, 255, 255 };
   img.Clear(white);
@@ -241,7 +268,7 @@ void DrawPolyList(const char *filename, list<TPPLPoly> *polys) {
     DrawPoly(&img, &(*iter), xmin, xmax, ymin, ymax);
   }
 
-  io.SaveImage(filename, &img);
+  io.SaveImage(fileNameTrue.data(), &img);
 }
 
 bool ComparePoly(TPPLPoly *p1, TPPLPoly *p2) {
@@ -333,6 +360,8 @@ int main() {
   DrawPolyList("test2.bmp", &result);
 }
 */
+
+
 
 int main() {
   int failures = 0;
