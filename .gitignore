@@ -2,3 +2,8 @@
 polypartition_test
 *.o
 *.bmp
+.vs
+bin64/
+out/
+linuxbin64/
+lib/
