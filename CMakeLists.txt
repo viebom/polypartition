@@ -22,13 +22,13 @@ endif()
 if(UNIX)
     add_definitions("-DUNIX64")
 
-    SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${XCG_ROOT_DIR}/linuxbin64/")
+    SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${ROOT_DIR}/linuxbin64/")
     #SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY     "${XCG_ROOT_DIR}/lib/linux_x64/")
-    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${XCG_ROOT_DIR}/linuxbin64/")
+    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ROOT_DIR}/linuxbin64/")
 else()
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${ROOT_DIR}/bin64")
     #set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${ROOT_DIR}/lib/")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${XCG_ROOT_DIR}/bin64/")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ROOT_DIR}/bin64/")
     add_definitions("-DWIN64")
 endif()
 
@@ -37,6 +37,5 @@ SET(XCG_HEADER_FILES "HeaderFiles")
 SET(XCG_SOURCE_FILES "SourceFiles")
 
 add_subdirectory ("test")
-
 
 
