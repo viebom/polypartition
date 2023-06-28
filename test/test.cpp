@@ -102,10 +102,10 @@ void ReadPolyList(const char *filename, list<TPPLPoly> *polys) {
 }
 
 void WritePoly(FILE *fp, TPPLPoly *poly) {
-  int i, numpoints;
+  tppl_idx i, numpoints;
   numpoints = poly->GetNumPoints();
 
-  fprintf(fp, "%d\n", numpoints);
+  fprintf(fp, "%ld\n", static_cast<long>(numpoints));
 
   if (poly->IsHole()) {
     fprintf(fp, "1\n");
@@ -272,7 +272,7 @@ void DrawPolyList(const char *filename, list<TPPLPoly> *polys) {
 }
 
 bool ComparePoly(TPPLPoly *p1, TPPLPoly *p2) {
-  long i, n = p1->GetNumPoints();
+  tppl_idx i, n = p1->GetNumPoints();
   if (n != p2->GetNumPoints()) {
     return false;
   }

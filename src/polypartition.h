@@ -26,6 +26,7 @@
 
 #include <list>
 #include <set>
+#include <vector>
 typedef int64_t tppl_idx;
 typedef double tppl_float;
 
@@ -94,21 +95,13 @@ struct TPPLPoint {
 // Polygon implemented as an array of points with a "hole" flag.
 class TPPLPoly {
   protected:
-  TPPLPoint *points;
-  tppl_idx numpoints;
-  bool hole;
+  std::vector<TPPLPoint> points;
+  bool hole = false;
 
   public:
-  // Constructors and destructors.
-  TPPLPoly();
-  ~TPPLPoly();
-
-  TPPLPoly(const TPPLPoly &src);
-  TPPLPoly &operator=(const TPPLPoly &src);
-
   // Getters and setters.
   tppl_idx GetNumPoints() const {
-    return numpoints;
+    return static_cast<tppl_idx>(points.size());
   }
 
   bool IsHole() const {
@@ -127,15 +120,15 @@ class TPPLPoly {
     return points[i];
   }
 
-  TPPLPoint *GetPoints() const {
+  std::vector<TPPLPoint> const& GetPoints() const {
     return points;
   }
 
-  TPPLPoint &operator[](const int i) {
+  TPPLPoint &operator[](const tppl_idx i) {
     return points[i];
   }
 
-  const TPPLPoint &operator[](const int i) const {
+  const TPPLPoint &operator[](const tppl_idx i) const {
     return points[i];
   }
 
@@ -167,7 +160,7 @@ class TPPLPoly {
   void SetOrientation(TPPLOrientation orientation);
 
   // Checks whether a polygon is valid or not.
-  bool Valid() const { return this->numpoints >= 3; }
+  bool Valid() const { return GetNumPoints() >= 3; }
 };
 
 #ifdef TPPL_ALLOCATOR
@@ -179,16 +172,14 @@ typedef std::list<TPPLPoly> TPPLPolyList;
 class TPPLPartition {
   protected:
   struct PartitionVertex {
-    bool isActive;
-    bool isConvex;
-    bool isEar;
+    bool isActive{};
+    bool isConvex{};
+    bool isEar{};
 
-    TPPLPoint p;
-    tppl_float angle;
-    PartitionVertex *previous;
-    PartitionVertex *next;
-
-    PartitionVertex();
+    TPPLPoint p{};
+    tppl_float angle{};
+    PartitionVertex *previous{};
+    PartitionVertex *next{};
   };
 
   struct MonotoneVertex {

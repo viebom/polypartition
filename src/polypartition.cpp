@@ -28,27 +28,14 @@
 #include <cstring>
 #include <vector>
 
-TPPLPoly::TPPLPoly() {
-  hole = false;
-  numpoints = 0;
-  points = nullptr;
-}
-
-TPPLPoly::~TPPLPoly() {
-  delete[] points;
-}
-
 void TPPLPoly::Clear() {
-  delete[] points;
   hole = false;
-  numpoints = 0;
-  points = nullptr;
+  points.clear();
 }
 
 void TPPLPoly::Init(const tppl_idx numpoints) {
   Clear();
-  this->numpoints = numpoints;
-  points = new TPPLPoint[numpoints];
+  points.resize(std::vector<TPPLPoint>::size_type(numpoints));
 }
 
 void TPPLPoly::Triangle(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3) {
@@ -58,32 +45,9 @@ void TPPLPoly::Triangle(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoin
   points[2] = p3;
 }
 
-TPPLPoly::TPPLPoly(const TPPLPoly &src) :
-        TPPLPoly() {
-  hole = src.hole;
-  numpoints = src.numpoints;
-
-  if (numpoints > 0) {
-    points = new TPPLPoint[numpoints];
-    std::memcpy(points, src.points, numpoints * sizeof(TPPLPoint));
-  }
-}
-
-TPPLPoly &TPPLPoly::operator=(const TPPLPoly &src) {
-  Clear();
-  hole = src.hole;
-  numpoints = src.numpoints;
-
-  if (numpoints > 0) {
-    points = new TPPLPoint[numpoints];
-    std::memcpy(points, src.points, numpoints * sizeof(TPPLPoint));
-  }
-
-  return *this;
-}
-
 TPPLOrientation TPPLPoly::GetOrientation() const {
   tppl_float area = 0;
+  auto const numpoints = GetNumPoints();
   for (tppl_idx i1 = 0; i1 < numpoints; i1++) {
     tppl_idx i2 = i1 + 1;
     if (i2 == numpoints) {
@@ -108,11 +72,7 @@ void TPPLPoly::SetOrientation(const TPPLOrientation orientation) {
 }
 
 void TPPLPoly::Invert() {
-  std::reverse(points, points + numpoints);
-}
-
-TPPLPartition::PartitionVertex::PartitionVertex() :
-        previous(nullptr), next(nullptr) {
+  std::reverse(points.begin(), points.end());
 }
 
 TPPLPoint TPPLPartition::Normalize(const TPPLPoint &p) {
@@ -1551,7 +1511,7 @@ int TPPLPartition::TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *tri
   TPPLPoly triangle;
 
   numpoints = inPoly->GetNumPoints();
-  const TPPLPoint *points = inPoly->GetPoints();
+  auto const& points = inPoly->GetPoints();
 
   // Trivial case.
   if (numpoints == 3) {
