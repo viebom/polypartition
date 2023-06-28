@@ -46,11 +46,11 @@ enum TPPLVertexType {
 
 // 2D point structure.
 struct TPPLPoint {
-  tppl_float x;
-  tppl_float y;
+  tppl_float x{};
+  tppl_float y{};
   // User-specified vertex identifier. Note that this isn't used internally
   // by the library, but will be faithfully copied around.
-  int id;
+  int id{};
 
   TPPLPoint operator+(const TPPLPoint &p) const {
     TPPLPoint r;
@@ -96,7 +96,7 @@ struct TPPLPoint {
 class TPPLPoly {
   protected:
   std::vector<TPPLPoint> points;
-  bool hole = false;
+  bool hole{};
 
   public:
   // Getters and setters.
@@ -176,7 +176,7 @@ class TPPLPartition {
     bool isConvex{};
     bool isEar{};
 
-    TPPLPoint p{};
+    TPPLPoint p;
     tppl_float angle{};
     PartitionVertex *previous{};
     PartitionVertex *next{};
@@ -184,16 +184,15 @@ class TPPLPartition {
 
   struct MonotoneVertex {
     TPPLPoint p;
-    tppl_idx previous;
-    tppl_idx next;
+    tppl_idx previous{};
+    tppl_idx next{};
   };
 
   class VertexSorter {
     MonotoneVertex *vertices;
 
 public:
-    VertexSorter(MonotoneVertex *v) :
-            vertices(v) {}
+    VertexSorter(MonotoneVertex *v) : vertices(v) {}
     bool operator()(tppl_idx index1, tppl_idx index2) const;
   };
 
@@ -213,60 +212,60 @@ public:
 
   // Dynamic programming state for minimum-weight triangulation.
   struct DPState {
-    bool visible;
-    tppl_float weight;
-    tppl_idx bestvertex;
+    bool visible{};
+    tppl_float weight{};
+    tppl_idx bestvertex{};
   };
 
   // Dynamic programming state for convex partitioning.
   struct DPState2 {
-    bool visible;
-    tppl_idx weight;
+    bool visible{};
+    tppl_idx weight{};
     DiagonalList pairs;
   };
 
   // Edge that intersects the scanline.
   struct ScanLineEdge {
-    mutable tppl_idx index;
+    mutable tppl_idx index{};
     TPPLPoint p1;
     TPPLPoint p2;
 
     // Determines if the edge is to the left of another edge.
     bool operator<(const ScanLineEdge &other) const;
 
-    bool IsConvex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3) const;
+    static bool IsConvex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
   };
 
   // Standard helper functions.
-  bool IsConvex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
-  bool IsReflex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
-  bool IsInside(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3, const TPPLPoint &p);
+  static bool IsConvex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
+  static bool IsReflex(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
+  static bool IsInside(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3, const TPPLPoint &p);
 
-  bool InCone(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3, const TPPLPoint &p);
-  bool InCone(const PartitionVertex *v, const TPPLPoint &p);
+  static bool InCone(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3, const TPPLPoint &p);
+  bool InCone(const PartitionVertex *v, const TPPLPoint &p) const;
 
-  int Intersects(const TPPLPoint &p11, const TPPLPoint &p12, const TPPLPoint &p21, const TPPLPoint &p22);
+  static int Intersects(const TPPLPoint &p11, const TPPLPoint &p12, const TPPLPoint &p21, const TPPLPoint &p22);
 
-  TPPLPoint Normalize(const TPPLPoint &p);
-  tppl_float Distance(const TPPLPoint &p1, const TPPLPoint &p2);
+  TPPLPoint Normalize(const TPPLPoint &p) const;
+  tppl_float Distance(const TPPLPoint &p1, const TPPLPoint &p2) const;
 
   // Helper functions for Triangulate_EC.
-  void UpdateVertexReflexity(PartitionVertex *v);
-  void UpdateVertex(PartitionVertex *v, const PartitionVertex *vertices, tppl_idx numvertices);
+  static void UpdateVertexReflexity(PartitionVertex *v);
+  void UpdateVertex(PartitionVertex *v, std::vector<PartitionVertex> const& vertices, tppl_idx numvertices) const;
 
   // Helper functions for ConvexPartition_OPT.
-  void UpdateState(tppl_idx a, tppl_idx b, tppl_idx w, tppl_idx i, tppl_idx j, DPState2 **dpstates);
-  void TypeA(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
-  void TypeB(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
+  static void UpdateState(tppl_idx a, tppl_idx b, tppl_idx w, tppl_idx i, tppl_idx j, DPState2 **dpstates);
+  static void TypeA(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
+  static void TypeB(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
 
   // Helper functions for MonotonePartition.
-  bool Below(const TPPLPoint &p1, const TPPLPoint &p2);
-  void AddDiagonal(MonotoneVertex *vertices, tppl_idx *numvertices, tppl_idx index1, tppl_idx index2,
+  static bool Below(const TPPLPoint &p1, const TPPLPoint &p2);
+  static void AddDiagonal(MonotoneVertex *vertices, tppl_idx *numvertices, tppl_idx index1, tppl_idx index2,
           TPPLVertexType *vertextypes, std::set<ScanLineEdge>::iterator *edgeTreeIterators,
           std::set<ScanLineEdge> *edgeTree, tppl_idx *helpers);
 
   // Triangulates a monotone polygon, used in Triangulate_MONO.
-  int TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *triangles);
+  static int TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *triangles);
 
   public:
   // Simple heuristic procedure for removing holes from a list of polygons.
@@ -282,7 +281,7 @@ public:
   //    outpolys:
   //       A list of polygons without holes.
   // Returns 1 on success, 0 on failure.
-  int RemoveHoles(TPPLPolyList *inpolys, TPPLPolyList *outpolys);
+  int RemoveHoles(TPPLPolyList *inpolys, TPPLPolyList *outpolys) const;
 
   // Triangulates a polygon by ear clipping.
   // Time complexity: O(n^2), n is the number of vertices.
@@ -294,7 +293,7 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
-  int Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles);
+  int Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles) const;
 
   // Triangulates a list of polygons that may contain holes by ear clipping
   // algorithm. It first calls RemoveHoles to get rid of the holes, and then
@@ -309,7 +308,7 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
-  int Triangulate_EC(TPPLPolyList *inpolys, TPPLPolyList *triangles);
+  int Triangulate_EC(TPPLPolyList *inpolys, TPPLPolyList *triangles) const;
 
   // Creates an optimal polygon triangulation in terms of minimal edge length.
   // Time complexity: O(n^3), n is the number of vertices
@@ -321,7 +320,7 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
-  int Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles);
+  int Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles) const;
 
   // Triangulates a polygon by first partitioning it into monotone polygons.
   // Time complexity: O(n*log(n)), n is the number of vertices.
@@ -362,7 +361,7 @@ public:
   //    monotonePolys:
   //       A list of monotone polygons (result).
   // Returns 1 on success, 0 on failure.
-  int MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monotonePolys);
+  int MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monotonePolys) const;
 
   // Partitions a polygon into convex polygons by using the
   // Hertel-Mehlhorn algorithm. The algorithm gives at most four times
@@ -378,7 +377,7 @@ public:
   //    parts:
   //       Resulting list of convex polygons.
   // Returns 1 on success, 0 on failure.
-  int ConvexPartition_HM(TPPLPoly *poly, TPPLPolyList *parts);
+  int ConvexPartition_HM(TPPLPoly *poly, TPPLPolyList *parts) const;
 
   // Partitions a list of polygons into convex parts by using the
   // Hertel-Mehlhorn algorithm. The algorithm gives at most four times
@@ -395,7 +394,7 @@ public:
   //    parts:
   //       Resulting list of convex polygons.
   // Returns 1 on success, 0 on failure.
-  int ConvexPartition_HM(TPPLPolyList *inpolys, TPPLPolyList *parts);
+  int ConvexPartition_HM(TPPLPolyList *inpolys, TPPLPolyList *parts) const;
 
   // Optimal convex partitioning (in terms of number of resulting
   // convex polygons) using the Keil-Snoeyink algorithm.
@@ -410,7 +409,7 @@ public:
   //    parts:
   //       Resulting list of convex polygons.
   // Returns 1 on success, 0 on failure.
-  int ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts);
+  int ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts) const;
 };
 
 #endif
