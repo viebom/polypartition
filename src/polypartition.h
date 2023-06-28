@@ -21,17 +21,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-/**
- * 不规则多边形三角剖分
- * 使用文档：
- * https://github.com/cfl997/polypartition
- */
 #ifndef POLYPARTITION_H
 #define POLYPARTITION_H
 
 #include <list>
 #include <set>
-
+typedef int64_t tppl_idx;
 typedef double tppl_float;
 
 enum TPPLOrientation {
@@ -100,7 +95,7 @@ struct TPPLPoint {
 class TPPLPoly {
   protected:
   TPPLPoint *points;
-  long numpoints;
+  tppl_idx numpoints;
   bool hole;
 
   public:
@@ -112,7 +107,7 @@ class TPPLPoly {
   TPPLPoly &operator=(const TPPLPoly &src);
 
   // Getters and setters.
-  long GetNumPoints() const {
+  tppl_idx GetNumPoints() const {
     return numpoints;
   }
 
@@ -124,11 +119,11 @@ class TPPLPoly {
     this->hole = hole;
   }
 
-  TPPLPoint &GetPoint(const long i) {
+  TPPLPoint &GetPoint(const tppl_idx i) {
     return points[i];
   }
 
-  const TPPLPoint &GetPoint(const long i) const {
+  const TPPLPoint &GetPoint(const tppl_idx i) const {
     return points[i];
   }
 
@@ -148,12 +143,12 @@ class TPPLPoly {
   void Clear();
 
   // Inits the polygon with numpoints vertices.
-  void Init(long numpoints);
+  void Init(tppl_idx numpoints);
 
   // Creates a triangle with points p1, p2, and p3.
   void Triangle(const TPPLPoint &p1, const TPPLPoint &p2, const TPPLPoint &p3);
 
-  // Inverts the orfer of vertices.
+  // Inverts the order of vertices.
   void Invert();
 
   // Returns the orientation of the polygon.
@@ -198,8 +193,8 @@ class TPPLPartition {
 
   struct MonotoneVertex {
     TPPLPoint p;
-    long previous;
-    long next;
+    tppl_idx previous;
+    tppl_idx next;
   };
 
   class VertexSorter {
@@ -208,14 +203,14 @@ class TPPLPartition {
 public:
     VertexSorter(MonotoneVertex *v) :
             vertices(v) {}
-    bool operator()(long index1, long index2) const;
+    bool operator()(tppl_idx index1, tppl_idx index2) const;
   };
 
   struct Diagonal {
-    long index1;
-    long index2;
+    tppl_idx index1;
+    tppl_idx index2;
 
-    Diagonal(const long i1, const long i2) :
+    Diagonal(const tppl_idx i1, const tppl_idx i2) :
             index1(i1), index2(i2) {}
   };
 
@@ -229,19 +224,19 @@ public:
   struct DPState {
     bool visible;
     tppl_float weight;
-    long bestvertex;
+    tppl_idx bestvertex;
   };
 
   // Dynamic programming state for convex partitioning.
   struct DPState2 {
     bool visible;
-    long weight;
+    tppl_idx weight;
     DiagonalList pairs;
   };
 
   // Edge that intersects the scanline.
   struct ScanLineEdge {
-    mutable long index;
+    mutable tppl_idx index;
     TPPLPoint p1;
     TPPLPoint p2;
 
@@ -266,18 +261,18 @@ public:
 
   // Helper functions for Triangulate_EC.
   void UpdateVertexReflexity(PartitionVertex *v);
-  void UpdateVertex(PartitionVertex *v, const PartitionVertex *vertices, long numvertices);
+  void UpdateVertex(PartitionVertex *v, const PartitionVertex *vertices, tppl_idx numvertices);
 
   // Helper functions for ConvexPartition_OPT.
-  void UpdateState(long a, long b, long w, long i, long j, DPState2 **dpstates);
-  void TypeA(long i, long j, long k, const PartitionVertex *vertices, DPState2 **dpstates);
-  void TypeB(long i, long j, long k, const PartitionVertex *vertices, DPState2 **dpstates);
+  void UpdateState(tppl_idx a, tppl_idx b, tppl_idx w, tppl_idx i, tppl_idx j, DPState2 **dpstates);
+  void TypeA(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
+  void TypeB(tppl_idx i, tppl_idx j, tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates);
 
   // Helper functions for MonotonePartition.
   bool Below(const TPPLPoint &p1, const TPPLPoint &p2);
-  void AddDiagonal(MonotoneVertex *vertices, long *numvertices, long index1, long index2,
+  void AddDiagonal(MonotoneVertex *vertices, tppl_idx *numvertices, tppl_idx index1, tppl_idx index2,
           TPPLVertexType *vertextypes, std::set<ScanLineEdge>::iterator *edgeTreeIterators,
-          std::set<ScanLineEdge> *edgeTree, long *helpers);
+          std::set<ScanLineEdge> *edgeTree, tppl_idx *helpers);
 
   // Triangulates a monotone polygon, used in Triangulate_MONO.
   int TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *triangles);
@@ -323,11 +318,6 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
-	/*
-	 *	支持开洞，并且开洞效果比Triangulate_MONO好
-	 *	Triangulate_MONO中有很多细小的三角形这是我们不需要的
-	 *	cfl-2023/01/17
-	 */
   int Triangulate_EC(TPPLPolyList *inpolys, TPPLPolyList *triangles);
 
   // Creates an optimal polygon triangulation in terms of minimal edge length.
@@ -340,10 +330,6 @@ public:
   //    triangles:
   //       A list of triangles (result).
   // Returns 1 on success, 0 on failure.
-	/*
-	 *	多边形不考虑洞的情况
-	 *	cfl-2022/01/17
-	 */
   int Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles);
 
   // Triangulates a polygon by first partitioning it into monotone polygons.

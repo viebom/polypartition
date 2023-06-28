@@ -45,7 +45,7 @@ void TPPLPoly::Clear() {
   points = nullptr;
 }
 
-void TPPLPoly::Init(const long numpoints) {
+void TPPLPoly::Init(const tppl_idx numpoints) {
   Clear();
   this->numpoints = numpoints;
   points = new TPPLPoint[numpoints];
@@ -84,8 +84,8 @@ TPPLPoly &TPPLPoly::operator=(const TPPLPoly &src) {
 
 TPPLOrientation TPPLPoly::GetOrientation() const {
   tppl_float area = 0;
-  for (long i1 = 0; i1 < numpoints; i1++) {
-    long i2 = i1 + 1;
+  for (tppl_idx i1 = 0; i1 < numpoints; i1++) {
+    tppl_idx i2 = i1 + 1;
     if (i2 == numpoints) {
       i2 = 0;
     }
@@ -167,7 +167,7 @@ int TPPLPartition::Intersects(const TPPLPoint &p11, const TPPLPoint &p12, const 
 int TPPLPartition::RemoveHoles(TPPLPolyList *inpolys, TPPLPolyList *outpolys) {
   TPPLPolyList polys;
   TPPLPolyList::iterator holeiter, polyiter, iter, iter2;
-  long i, i2, holepointindex, polypointindex;
+  tppl_idx i, i2, holepointindex, polypointindex;
   TPPLPoint holepoint, polypoint, bestpolypoint;
   TPPLPoint linep1, linep2;
   TPPLPoint v1, v2;
@@ -351,7 +351,7 @@ void TPPLPartition::UpdateVertexReflexity(PartitionVertex *v) {
   v->isConvex = !IsReflex(v->previous->p, v->p, v->next->p);
 }
 
-void TPPLPartition::UpdateVertex(PartitionVertex *v, const PartitionVertex *vertices, const long numvertices) {
+void TPPLPartition::UpdateVertex(PartitionVertex *v, const PartitionVertex *vertices, const tppl_idx numvertices) {
   const PartitionVertex *v1 = v->previous;
   const PartitionVertex *v3 = v->next;
 
@@ -363,7 +363,7 @@ void TPPLPartition::UpdateVertex(PartitionVertex *v, const PartitionVertex *vert
 
   if (v->isConvex) {
     v->isEar = true;
-    for (long i = 0; i < numvertices; i++) {
+    for (tppl_idx i = 0; i < numvertices; i++) {
       if (vertices[i].p == v->p || vertices[i].p == v1->p || vertices[i].p == v3->p) {
         continue;
       }
@@ -385,7 +385,7 @@ int TPPLPartition::Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles) {
 
   PartitionVertex *ear = nullptr;
   TPPLPoly triangle;
-  long i;
+  tppl_idx i;
 
   if (poly->GetNumPoints() < 3) {
     return 0;
@@ -395,7 +395,7 @@ int TPPLPartition::Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles) {
     return 1;
   }
 
-  long numvertices = poly->GetNumPoints();
+  tppl_idx numvertices = poly->GetNumPoints();
 
   auto vertices = new PartitionVertex[numvertices];
   for (i = 0; i < numvertices; i++) {
@@ -419,7 +419,7 @@ int TPPLPartition::Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles) {
   for (i = 0; i < numvertices - 3; i++) {
     bool earfound = false;
     // Find the most extruded ear.
-    for (long j = 0; j < numvertices; j++) {
+    for (tppl_idx j = 0; j < numvertices; j++) {
       if (!vertices[j].isActive) {
         continue;
       }
@@ -491,11 +491,11 @@ int TPPLPartition::ConvexPartition_HM(TPPLPoly *poly, TPPLPolyList *parts) {
   TPPLPoly *poly1 = nullptr, *poly2 = nullptr;
   TPPLPoly newpoly;
   TPPLPoint d1, d2, p1, p2, p3;
-  long i11, i12, i21, i22, i13, i23, j, k;
+  tppl_idx i11, i12, i21, i22, i13, i23, j, k;
   bool isdiagonal;
 
   // Check if the poly is already convex.
-  long numreflex = 0;
+  tppl_idx numreflex = 0;
   for (i11 = 0; i11 < poly->GetNumPoints(); i11++) {
     if (i11 == 0) {
       i12 = poly->GetNumPoints() - 1;
@@ -638,15 +638,15 @@ int TPPLPartition::Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles) {
     return 0;
   }
 
-  long i, j, k, gap;
+  tppl_idx i, j, k, gap;
   TPPLPoint p1, p2, p3, p4;
-  long bestvertex;
+  tppl_idx bestvertex;
   tppl_float weight, minweight, d1, d2;
   DiagonalList diagonals;
   TPPLPoly triangle;
   int ret = 1;
 
-  long n = poly->GetNumPoints();
+  tppl_idx n = poly->GetNumPoints();
   auto dpstates = new DPState *[n];
   for (i = 1; i < n; i++) {
     dpstates[i] = new DPState[i];
@@ -786,8 +786,8 @@ int TPPLPartition::Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles) {
   return ret;
 }
 
-void TPPLPartition::UpdateState(const long a, const long b, const long w, const long i, const long j, DPState2 **dpstates) {
-  const long w2 = dpstates[a][b].weight;
+void TPPLPartition::UpdateState(const tppl_idx a, const tppl_idx b, const tppl_idx w, const tppl_idx i, const tppl_idx j, DPState2 **dpstates) {
+  const tppl_idx w2 = dpstates[a][b].weight;
   if (w > w2) {
     return;
   }
@@ -808,12 +808,12 @@ void TPPLPartition::UpdateState(const long a, const long b, const long w, const 
   }
 }
 
-void TPPLPartition::TypeA(const long i, const long j, const long k, const PartitionVertex *vertices, DPState2 **dpstates) {
+void TPPLPartition::TypeA(const tppl_idx i, const tppl_idx j, const tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates) {
   if (!dpstates[i][j].visible) {
     return;
   }
-  long top = j;
-  long w = dpstates[i][j].weight;
+  tppl_idx top = j;
+  tppl_idx w = dpstates[i][j].weight;
   if (k - j > 1) {
     if (!dpstates[j][k].visible) {
       return;
@@ -845,12 +845,12 @@ void TPPLPartition::TypeA(const long i, const long j, const long k, const Partit
   UpdateState(i, k, w, top, j, dpstates);
 }
 
-void TPPLPartition::TypeB(const long i, const long j, const long k, const PartitionVertex *vertices, DPState2 **dpstates) {
+void TPPLPartition::TypeB(const tppl_idx i, const tppl_idx j, const tppl_idx k, const PartitionVertex *vertices, DPState2 **dpstates) {
   if (!dpstates[j][k].visible) {
     return;
   }
-  long top = j;
-  long w = dpstates[j][k].weight;
+  tppl_idx top = j;
+  tppl_idx w = dpstates[j][k].weight;
 
   if (j - i > 1) {
     if (!dpstates[i][j].visible) {
@@ -892,14 +892,14 @@ int TPPLPartition::ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts) {
   TPPLPoint p1, p2, p3, p4;
   PartitionVertex *vertices = nullptr;
   DPState2 **dpstates = nullptr;
-  long i, j, k, n, gap;
+  tppl_idx i, j, k, n, gap;
   DiagonalList diagonals, diagonals2;
   DiagonalList *pairs = nullptr, *pairs2 = nullptr;
   DiagonalList::iterator iter, iter2;
   int ret;
   TPPLPoly newpoly;
-  std::vector<long> indices;
-  std::vector<long>::iterator iiter;
+  std::vector<tppl_idx> indices;
+  std::vector<tppl_idx>::iterator iiter;
   bool ijreal, jkreal;
 
   n = poly->GetNumPoints();
@@ -1150,7 +1150,7 @@ int TPPLPartition::ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts) {
     }
 
     std::sort(indices.begin(), indices.end());
-    newpoly.Init((long)indices.size());
+    newpoly.Init((tppl_idx)indices.size());
     k = 0;
     for (iiter = indices.begin(); iiter != indices.end(); ++iiter) {
       newpoly[k] = vertices[*iiter].p;
@@ -1179,8 +1179,8 @@ int TPPLPartition::ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts) {
 int TPPLPartition::MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monotonePolys) {
   TPPLPolyList::iterator iter;
   MonotoneVertex *vertices = nullptr;
-  long i, numvertices, vindex, vindex2, newnumvertices, maxnumvertices;
-  long polystartindex, polyendindex;
+  tppl_idx i, numvertices, vindex, vindex2, newnumvertices, maxnumvertices;
+  tppl_idx polystartindex, polyendindex;
   TPPLPoly *poly = nullptr;
   MonotoneVertex *v = nullptr, *v2 = nullptr, *vprev = nullptr, *vnext = nullptr;
   ScanLineEdge newedge;
@@ -1219,7 +1219,7 @@ int TPPLPartition::MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monoto
   }
 
   // Construct the priority queue.
-  auto priority = new long[numvertices];
+  auto priority = new tppl_idx[numvertices];
   for (i = 0; i < numvertices; i++) {
     priority[i] = i;
   }
@@ -1250,7 +1250,7 @@ int TPPLPartition::MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monoto
   }
 
   // Helpers.
-  auto helpers = new long[maxnumvertices];
+  auto helpers = new tppl_idx[maxnumvertices];
 
   // Binary search tree that holds edges intersecting the scanline.
   // Note that while set doesn't actually have to be implemented as
@@ -1417,7 +1417,7 @@ int TPPLPartition::MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monoto
 
   if (!error) {
     // Return result.
-    long size;
+    tppl_idx size;
     TPPLPoly mpoly;
     for (i = 0; i < newnumvertices; i++) {
       if (used[i]) {
@@ -1462,10 +1462,10 @@ int TPPLPartition::MonotonePartition(TPPLPolyList *inpolys, TPPLPolyList *monoto
 }
 
 // Adds a diagonal to the doubly-connected list of vertices.
-void TPPLPartition::AddDiagonal(MonotoneVertex *vertices, long *numvertices, const long index1, const long index2,
+void TPPLPartition::AddDiagonal(MonotoneVertex *vertices, tppl_idx *numvertices, const tppl_idx index1, const tppl_idx index2,
         TPPLVertexType *vertextypes, std::set<ScanLineEdge>::iterator *edgeTreeIterators,
-        std::set<ScanLineEdge> *edgeTree, long *helpers) {
-  long newindex1, newindex2;
+        std::set<ScanLineEdge> *edgeTree, tppl_idx *helpers) {
+  tppl_idx newindex1, newindex2;
 
   newindex1 = *numvertices;
   (*numvertices)++;
@@ -1510,7 +1510,7 @@ bool TPPLPartition::Below(const TPPLPoint &p1, const TPPLPoint &p2) {
 }
 
 // Sorts in the falling order of y values, if y is equal, x is used instead.
-bool TPPLPartition::VertexSorter::operator()(const long index1, const long index2) const {
+bool TPPLPartition::VertexSorter::operator()(const tppl_idx index1, const tppl_idx index2) const {
   if (vertices[index1].p.y > vertices[index2].p.y) {
     return true;
   }
@@ -1546,8 +1546,8 @@ int TPPLPartition::TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *tri
     return 0;
   }
 
-  long i, i2, j, topindex, bottomindex, leftindex, rightindex, vindex;
-  long numpoints;
+  tppl_idx i, i2, j, topindex, bottomindex, leftindex, rightindex, vindex;
+  tppl_idx numpoints;
   TPPLPoly triangle;
 
   numpoints = inPoly->GetNumPoints();
@@ -1595,7 +1595,7 @@ int TPPLPartition::TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *tri
   }
 
   auto vertextypes = new char[numpoints];
-  auto priority = new long[numpoints];
+  auto priority = new tppl_idx[numpoints];
 
   // Merge left and right vertex chains.
   priority[0] = topindex;
@@ -1644,11 +1644,11 @@ int TPPLPartition::TriangulateMonotone(const TPPLPoly *inPoly, TPPLPolyList *tri
   priority[i] = bottomindex;
   vertextypes[bottomindex] = 0;
 
-  auto stack = new long[numpoints];
+  auto stack = new tppl_idx[numpoints];
 
   stack[0] = priority[0];
   stack[1] = priority[1];
-  long stackptr = 2;
+  tppl_idx stackptr = 2;
 
   // For each vertex from top to bottom trim as many triangles as possible.
   for (i = 2; i < (numpoints - 1); i++) {

@@ -133,7 +133,7 @@ void WritePoly(const char *filename, TPPLPoly *poly) {
 void WritePolyList(FILE *fp, list<TPPLPoly> *polys) {
   list<TPPLPoly>::iterator iter;
 
-  fprintf(fp, "%ld\n", polys->size());
+  fprintf(fp, "%llu\n", polys->size());
 
   for (iter = polys->begin(); iter != polys->end(); iter++) {
     WritePoly(fp, &(*iter));
