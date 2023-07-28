@@ -127,7 +127,7 @@ int TPPLPartition::Intersects(const TPPLPoint &p11, const TPPLPoint &p12, const 
 int TPPLPartition::RemoveHoles(TPPLPolyList *inpolys, TPPLPolyList *outpolys) const {
   TPPLPolyList polys;
   TPPLPolyList::iterator holeiter, polyiter, iter, iter2;
-  tppl_idx i, i2, holepointindex, polypointindex;
+  tppl_idx i, i2, holepointindex{}, polypointindex{};
   TPPLPoint holepoint, polypoint, bestpolypoint;
   TPPLPoint linep1, linep2;
   TPPLPoint v1, v2;
@@ -446,7 +446,7 @@ int TPPLPartition::ConvexPartition_HM(TPPLPoly *poly, TPPLPolyList *parts) const
   TPPLPoly *poly1 = nullptr, *poly2 = nullptr;
   TPPLPoly newpoly;
   TPPLPoint d1, d2, p1, p2, p3;
-  tppl_idx i11, i12, i21, i22, i13, i23, j, k;
+  tppl_idx i11, i12, i21{}, i22{}, i13, i23, j, k;
   bool isdiagonal;
 
   // Check if the poly is already convex.
@@ -596,7 +596,7 @@ int TPPLPartition::Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles) cons
   tppl_idx i, j, k, gap;
   TPPLPoint p1, p2, p3, p4;
   tppl_idx bestvertex;
-  tppl_float weight, minweight, d1, d2;
+  tppl_float weight, minweight{}, d1, d2;
   DiagonalList diagonals;
   TPPLPoly triangle;
   int ret = 1;
